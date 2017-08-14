@@ -1,8 +1,8 @@
-// import React from 'react'
-// import ReactDOM from 'react-dom'
+import React from 'react'
+import ReactDOM from 'react-dom'
 import registerServiceWorker from './registerServiceWorker';
 // import expect from 'expect'
-import {createStore} from 'redux'
+import {createStore, combineReducers} from 'redux'
 // import deepFreeze from 'deep-freeze'
 registerServiceWorker();
 
@@ -52,16 +52,7 @@ const visibilityFilter = (
       return state
   }
 }
-const combineReducers = (reducers) => {
-  return (state = {}, action) => {
-    return Object.keys(reducers).reduce(
-      (nextState, key) => {
-        nextState[key] = reducers[key](state[key], action)
-        return nextState
-      }, {}
-    )
-  }
-}
+
 const todoApp = combineReducers({
   todos,
   visibilityFilter
@@ -69,40 +60,43 @@ const todoApp = combineReducers({
 
 const store = createStore(todoApp)
 
-console.group('Dispatching ADD_TODO')
-store.dispatch({
-  type: 'ADD_TODO',
-  id: 0,
-  text: 'Learn Redux'
-})
-console.log('Current State')
-console.log(store.getState())
-console.groupEnd()
+let nextTodoId = 0
+const TodoApp = ({todos}) => {
+  let input
+  return (<div>
+    <form
+      onSubmit={ e => {
+        e.preventDefault()
+        let text = input.value.trim()
+        if (text.length === 0) return
+        store.dispatch({
+          type: 'ADD_TODO',
+          id: nextTodoId++,
+          text
+        })
+        input.value = ''
+        input.focus()
+      }}
+    >
+      <input type='text' ref={node => input = node}/>
+      <button>Add Todo</button>
+    </form>
+    <ul>
+      {
+        todos.map(todo => (
+          <li key={todo.id}>{todo.text}</li>
+        ))
+      }
+    </ul>
+  </div>)
+}
 
-console.group('Dispatching another ADD_TODO')
-store.dispatch({
-  type: 'ADD_TODO',
-  id: 1,
-  text: 'Go Shopping'
-})
-console.log('Current State')
-console.log(store.getState())
-console.groupEnd()
+const render = () => {
+  ReactDOM.render(
+    (<TodoApp todos={store.getState().todos}/>),
+    document.getElementById('root')
+  )
+}
 
-console.group('Dispatching TOGGLE_TODO 1')
-store.dispatch({
-  type: 'TOGGLE_TODO',
-  id: 1
-})
-console.log('Current State')
-console.log(store.getState())
-console.groupEnd()
-
-console.group('Dispatching SET_VISIBILITY_FILTER')
-store.dispatch({
-  type: 'SET_VISIBILITY_FILTER',
-  filter: 'SHOW_COMPLETED'
-})
-console.log('Current State')
-console.log(store.getState())
-console.groupEnd()
+store.subscribe(render)
+render()
