@@ -1,9 +1,9 @@
 // import React from 'react'
 // import ReactDOM from 'react-dom'
 import registerServiceWorker from './registerServiceWorker';
-import expect from 'expect'
-// import {createStore} from 'redux'
-import deepFreeze from 'deep-freeze'
+// import expect from 'expect'
+import {createStore} from 'redux'
+// import deepFreeze from 'deep-freeze'
 registerServiceWorker();
 
 document.title = 'Redux Full Sample'
@@ -41,67 +41,67 @@ const todos = (state = [], action) => {
   }
 }
 
-const testAddTodo = () => {
-  const stateBefore = []
-  const action = {
-    type: 'ADD_TODO',
-    id: 0,
-    text: 'Learn Redux'
+const visibilityFilter = (
+  state = 'SHOW_ALL',
+  action
+) => {
+  switch (action.type) {
+    case 'SET_VISIBILITY_FILTER':
+      return action.filter
+    default:
+      return state
   }
-  const stateAfter = [
-    {
-      id: 0,
-      text: 'Learn Redux',
-      completed: false
-    }
-  ]
-
-  deepFreeze(stateBefore)
-  deepFreeze(action)
-
-  expect(
-    todos(stateBefore, action)
-  ).toEqual(stateAfter)
 }
 
-const testToggleTodo = () => {
-  const stateBefore = [
-    {
-      id: 0,
-      text: 'Go shopping',
-      completed: false
-    },
-    {
-      id: 1,
-      text: 'Learn Redux',
-      completed: false
-    }
-  ]
-  const action = {
-    type: 'TOGGLE_TODO',
-    id: 1
+const todoApp = (state = {}, action ) => {
+  return {
+    todos: todos(
+      state.todos,
+      action
+    ),
+    visibilityFilter: visibilityFilter(
+      state.visibilityFilter,
+      action
+    )
   }
-  const stateAfter = [
-    {
-      id: 0,
-      text: 'Go shopping',
-      completed: false
-    },
-    {
-      id: 1,
-      text: 'Learn Redux',
-      completed: true
-    }
-  ]
-
-  deepFreeze(stateBefore)
-  deepFreeze(action)
-
-  expect(
-    todos(stateBefore, action)
-  ).toEqual(stateAfter)
 }
 
-testAddTodo()
-testToggleTodo()
-console.log('All tests passed')
+const store = createStore(todoApp)
+
+console.group('Dispatching ADD_TODO')
+store.dispatch({
+  type: 'ADD_TODO',
+  id: 0,
+  text: 'Learn Redux'
+})
+console.log('Current State')
+console.log(store.getState())
+console.groupEnd()
+
+console.group('Dispatching another ADD_TODO')
+store.dispatch({
+  type: 'ADD_TODO',
+  id: 1,
+  text: 'Go Shopping'
+})
+console.log('Current State')
+console.log(store.getState())
+console.groupEnd()
+
+console.group('Dispatching TOGGLE_TODO 1')
+store.dispatch({
+  type: 'TOGGLE_TODO',
+  id: 1
+})
+console.log('Current State')
+console.log(store.getState())
+console.groupEnd()
+
+console.group('Dispatching SET_VISIBILITY_FILTER')
+store.dispatch({
+  type: 'SET_VISIBILITY_FILTER',
+  filter: 'SHOW_COMPLETED'
+})
+console.log('Current State')
+console.log(store.getState())
+console.groupEnd()
