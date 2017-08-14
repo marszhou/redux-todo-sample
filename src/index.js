@@ -1,45 +1,59 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
+// import React from 'react'
+// import ReactDOM from 'react-dom'
 import registerServiceWorker from './registerServiceWorker';
 import expect from 'expect'
-import {createStore} from 'redux'
+// import {createStore} from 'redux'
+import deepFreeze from 'deep-freeze'
 registerServiceWorker();
 
 document.title = 'Redux Full Sample'
 
-const counter = (state = 0, action) => {
-  switch (action.type) {
-    case 'INCREMENT':
-      return state + 1
-    case 'DECREMENT':
-      return state - 1
-    default:
-      return state
-  }
+const addCounter = (list) => {
+  return [...list, 0]
 }
 
-const Counter = ({
-  value,
-  onIncrement,
-  onDecrement
-}) => (
-  <div>
-    <h1>{value}</h1>
-    <button onClick={onIncrement}>+</button>
-    <button onClick={onDecrement}>-</button>
-  </div>
-)
+const removeCounter = (list, index) => {
+  return [...list.slice(0, index), ...list.slice(index + 1)]
+}
 
-const store = createStore(counter)
+const incrementCounter = (list, index) => {
+  return [...list.slice(0, index), list[index] + 1, ...list.slice(index + 1) ]
+}
 
-const render = () => ReactDOM.render(
-  (<Counter
-    value={store.getState()}
-    onIncrement={() => store.dispatch({type: 'INCREMENT'})}
-    onDecrement={() => store.dispatch({type: 'DECREMENT'})}
-  />),
-  document.getElementById('root')
-)
+const testAddCounter = () => {
+  const listBefore = []
+  const listAfter = [0]
 
-window.uns = store.subscribe(render)
-render()
+  deepFreeze(listBefore)
+
+  expect(
+    addCounter(listBefore)
+  ).toEqual(listAfter)
+}
+
+const testRemoveCounter = () => {
+  const listBefore = [1, 2, 3]
+  const listAfter = [1, 3]
+
+  deepFreeze(listBefore)
+
+  expect(
+    removeCounter(listBefore, 1)
+  ).toEqual(listAfter)
+}
+
+const testIncrementCounter = () => {
+  const listBefore = [1, 2, 3]
+  const listAfter = [1, 3, 3]
+
+  deepFreeze(listBefore)
+
+  expect(
+    incrementCounter(listBefore, 1)
+  ).toEqual(listAfter)
+}
+
+testAddCounter()
+testRemoveCounter()
+testIncrementCounter()
+console.log('All tests passed.')
