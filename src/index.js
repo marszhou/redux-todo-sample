@@ -60,9 +60,48 @@ const todoApp = combineReducers({
 
 const store = createStore(todoApp)
 
+const getVisibleTodos = (
+  todos,
+  filter
+) => {
+  switch (filter) {
+    case 'SHOW_ALL':
+      return todos
+    case 'SHOW_ACTIVE':
+      return todos.filter(t => !t.completed)
+    case 'SHOW_COMPLETED':
+      return todos.filter(t => t.completed)
+  }
+}
+
+const FilterLink = ({
+  filter,
+  currentFilter,
+  children
+}) => {
+  if (filter === currentFilter) {
+    return (<span>{children}</span>)
+  }
+  return (
+    <a href='#'
+       onClick={ e => {
+        e.preventDefault()
+        store.dispatch({
+          type: 'SET_VISIBILITY_FILTER',
+          filter
+        })
+       }}
+    >
+      {children}
+    </a>
+  )
+}
+
 let nextTodoId = 0
-const TodoApp = ({todos}) => {
+const TodoApp = ({todos, visibilityFilter}) => {
   let input
+  let visibleTodos = getVisibleTodos(todos, visibilityFilter)
+
   return (<div>
     <form
       onSubmit={ e => {
@@ -83,7 +122,7 @@ const TodoApp = ({todos}) => {
     </form>
     <ul>
       {
-        todos.map(todo => (
+        visibleTodos.map(todo => (
           <li key={todo.id}
               onClick={
                 () => {
@@ -93,17 +132,38 @@ const TodoApp = ({todos}) => {
                   })
                 }
               }
-              style={{textDecoration: todo.completed ? 'line-through' : 'none'}}
+              style={{
+                textDecoration: todo.completed
+                  ? 'line-through' : 'none'
+              }}
           >{todo.text}</li>
         ))
       }
     </ul>
+    <p>
+      Show:
+      {' '}
+      <FilterLink
+        filter='SHOW_ALL'
+        currentFilter={visibilityFilter}
+      >All</FilterLink>
+      {', '}
+      <FilterLink
+        filter='SHOW_ACTIVE'
+        currentFilter={visibilityFilter}
+      >Active</FilterLink>
+      {', '}
+      <FilterLink
+        filter='SHOW_COMPLETED'
+        currentFilter={visibilityFilter}
+      >Completed</FilterLink>
+    </p>
   </div>)
 }
 
 const render = () => {
   ReactDOM.render(
-    (<TodoApp todos={store.getState().todos}/>),
+    (<TodoApp {...store.getState()}/>),
     document.getElementById('root')
   )
 }
