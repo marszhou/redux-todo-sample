@@ -1,6 +1,6 @@
 import registerServiceWorker from './registerServiceWorker';
 import expect from 'expect'
-import {createStore} from 'redux'
+// import {createStore} from 'redux'
 registerServiceWorker();
 
 document.title = 'Redux Full Sample'
@@ -16,11 +16,34 @@ const counter = (state = 0, action) => {
   }
 }
 
+const createStore = (reducer) => {
+  let state
+  let listeners = []
+
+  const getState = () => state
+  const dispatch = (action) => {
+    state = reducer(state, action)
+    listeners.forEach(listener => listener())
+  }
+  const subscribe = (listener) => {
+    listeners.push(listener)
+    return () => listeners = listeners.filter(l => l !== listener)
+  }
+
+  dispatch({})
+
+  return {
+    getState,
+    dispatch,
+    subscribe
+  }
+}
+
 const store = createStore(counter)
 
 const render = () => document.body.innerText = store.getState()
 
-store.subscribe(render)
+window.uns = store.subscribe(render)
 render()
 
 document.addEventListener('click', () => store.dispatch({type: 'INCREMENT'}))
