@@ -176,7 +176,7 @@ const TodoList = ({
   </ul>
 )
 
-const mapStateToProps = (state) => {
+const mapStateToTodoListProps = (state) => {
   return {
     todos: getVisibleTodos(
       state.todos,
@@ -184,7 +184,7 @@ const mapStateToProps = (state) => {
     )
   }
 }
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToTodoListProps = (dispatch) => {
   return {
     onTodoClick: id => {
       dispatch({
@@ -195,11 +195,11 @@ const mapDispatchToProps = (dispatch) => {
   }
 }
 const VisibleTodoList = connect(
-  mapStateToProps,
-  mapDispatchToProps
+  mapStateToTodoListProps,
+  mapDispatchToTodoListProps
 )(TodoList)
 
-const AddTodo = ({}, {store}) => {
+let AddTodo = ({ dispatch }) => {
   let input
 
   return (
@@ -208,7 +208,7 @@ const AddTodo = ({}, {store}) => {
         e.preventDefault()
         let text = input.value.trim()
         if (text.length === 0) return
-        store.dispatch({
+        dispatch({
           type: 'ADD_TODO',
           text,
           id: nextTodoId++
@@ -222,9 +222,12 @@ const AddTodo = ({}, {store}) => {
     </form>
   )
 }
-AddTodo.contextTypes = {
-  store: React.PropTypes.object
-}
+AddTodo = connect(
+  // state => ({}),
+  // null,
+  // dispatch => ({dispatch})
+  // null
+)(AddTodo)
 
 let nextTodoId = 0
 const TodoApp = () => {
