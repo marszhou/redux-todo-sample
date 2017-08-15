@@ -1,13 +1,13 @@
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router'
-import { getVisibleTodos } from '../selectors'
 import TodoList from '../components/TodoList'
 import { toggleTodo } from '../actions'
+import { getVisibleTodos } from '../reducers'
 
 const mapStateToProps = (state, { params }) => {
   return {
     todos: getVisibleTodos(
-      state.todos,
+      state,
       params.filter || 'all'
     )
   }
