@@ -1,15 +1,19 @@
 import { createStore } from 'redux'
 import todoApp from './reducers'
+import { loadState, saveState } from './localStorage'
+import debounce from 'lodash/debounce'
 
-const persistedState = {
-  todos: [{
-    id: 0,
-    text: 'Welcome back',
-    completed: false
-  }]
-}
+const persistedState = loadState()
 
-export default createStore(
+const store = createStore(
   todoApp,
   persistedState
 )
+
+store.subscribe(debounce(() => {
+  saveState({
+    todos: store.getState().todos
+  })
+}, 500))
+
+export default store
