@@ -1,10 +1,15 @@
-import todos from './reducers/todos'
-import visibilityFilter from './reducers/visibilityFilter'
-import { createStore, combineReducers } from 'redux'
+import { createStore } from 'redux'
+import todoApp from './reducers'
+
+const persistedState = {
+  todos: [{
+    id: 0,
+    text: 'Welcome back',
+    completed: false
+  }]
+}
 
 export default createStore(
-  combineReducers({
-    todos,
-    visibilityFilter
-  })
+  todoApp,
+  persistedState
 )
