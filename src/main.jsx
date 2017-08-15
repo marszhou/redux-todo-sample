@@ -173,6 +173,38 @@ const TodoList = ({
   </ul>
 )
 
+class VisibleTodoList extends React.Component {
+  componentWillMount() {
+    this.unsubscribe = store.subscribe(() => this.forceUpdate())
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe()
+  }
+
+  render() {
+    const props = this.props
+    const state = store.getState()
+
+    return (
+      <TodoList
+        todos={
+          getVisibleTodos(
+            state.todos,
+            state.visibilityFilter
+          )
+        }
+        onTodoClick={id =>
+          store.dispatch({
+            type: 'TOGGLE_TODO',
+            id
+          })
+        }
+      />
+    )
+  }
+}
+
 const AddTodo = ({
   onAddClick
 }) => {
@@ -184,7 +216,11 @@ const AddTodo = ({
         e.preventDefault()
         let text = input.value.trim()
         if (text.length === 0) return
-        onAddClick(text)
+        store.dispatch({
+          type: 'ADD_TODO',
+          text,
+          id: nextTodoId++
+        })
         input.value = ''
         input.focus()
       }}
@@ -195,40 +231,16 @@ const AddTodo = ({
   )
 }
 
-
-
 let nextTodoId = 0
-const TodoApp = ({todos, visibilityFilter}) => {
-  let visibleTodos = getVisibleTodos(todos, visibilityFilter)
-
+const TodoApp = () => {
   return (<div>
-    <AddTodo
-      onAddClick={text =>
-        store.dispatch({
-          type: 'ADD_TODO',
-          text,
-          id: nextTodoId++
-        })
-      }/>
-    <TodoList
-      todos={visibleTodos}
-      onTodoClick={ id =>
-        store.dispatch({
-          type: 'TOGGLE_TODO',
-          id
-        })
-      }
-    />
+    <AddTodo />
+    <VisibleTodoList />
     <Footer />
   </div>)
 }
 
-const render = () => {
-  ReactDOM.render(
-    (<TodoApp {...store.getState()}/>),
-    document.getElementById('root')
-  )
-}
-
-store.subscribe(render)
-render()
+ReactDOM.render(
+  (<TodoApp />),
+  document.getElementById('root')
+)
