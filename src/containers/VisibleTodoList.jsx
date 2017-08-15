@@ -3,11 +3,11 @@ import { getVisibleTodos } from '../selectors'
 import TodoList from '../components/TodoList'
 import { toggleTodo } from '../actions'
 
-const mapStateToProps = (state) => {
+const mapStateToProps = (state, ownProps) => {
   return {
     todos: getVisibleTodos(
       state.todos,
-      state.visibilityFilter
+      ownProps.filter
     )
   }
 }

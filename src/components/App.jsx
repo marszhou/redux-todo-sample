@@ -3,11 +3,13 @@ import AddTodo from '../containers/AddTodo'
 import VisibleTodoList from '../containers/VisibleTodoList'
 import Footer from './Footer'
 
-export default () => {
+export default ({ params }) => {
   return (
     <div>
       <AddTodo />
-      <VisibleTodoList />
+      <VisibleTodoList
+        filter={params.filter || 'all'}
+      />
       <Footer />
     </div>
   )
