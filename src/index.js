@@ -1,18 +1,16 @@
 import registerServiceWorker from './registerServiceWorker';
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { Provider } from 'react-redux'
-import TodoApp from './App'
-import store from './store'
+import configureStore from './configureStore'
+import Root from './components/Root'
 
 registerServiceWorker();
 document.title = 'Redux Full Sample'
 
+const store = configureStore()
 ReactDOM.render(
   (
-    <Provider store={store}>
-      <TodoApp />
-    </Provider>
+    <Root store={store} />
   ),
   document.getElementById('root')
 )
