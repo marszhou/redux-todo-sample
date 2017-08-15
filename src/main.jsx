@@ -3,6 +3,23 @@ import ReactDOM from 'react-dom'
 import {createStore, combineReducers} from 'redux'
 import {Provider, connect} from 'react-redux'
 
+let nextTodoId = 0
+const addTodo = (text) => ({
+  type: 'ADD_TODO',
+  text,
+  id: nextTodoId++
+})
+
+const setVisibilityFilter = (filter) => ({
+  type: 'SET_VISIBILITY_FILTER',
+  filter
+})
+
+const toggleTodo = id => ({
+  type: 'TOGGLE_TODO',
+  id
+})
+
 const todo = (state={}, action) => {
   switch (action.type) {
     case 'ADD_TODO':
@@ -106,10 +123,9 @@ const mapDispatchToLinkProps = (
 ) => {
   return {
     onClick() {
-      dispatch({
-        type: 'SET_VISIBILITY_FILTER',
-        filter: ownProps.filter
-      })
+      dispatch(
+        setVisibilityFilter(ownProps.filter)
+      )
     }
   }
 }
@@ -180,10 +196,7 @@ const mapStateToTodoListProps = (state) => {
 const mapDispatchToTodoListProps = (dispatch) => {
   return {
     onTodoClick: id => {
-      dispatch({
-        type: 'TOGGLE_TODO',
-        id
-      })
+      dispatch(toggleTodo(id))
     }
   }
 }
@@ -201,11 +214,7 @@ let AddTodo = ({ dispatch }) => {
         e.preventDefault()
         let text = input.value.trim()
         if (text.length === 0) return
-        dispatch({
-          type: 'ADD_TODO',
-          text,
-          id: nextTodoId++
-        })
+        dispatch(addTodo(text))
         input.value = ''
         input.focus()
       }}
@@ -215,14 +224,8 @@ let AddTodo = ({ dispatch }) => {
     </form>
   )
 }
-AddTodo = connect(
-  // state => ({}),
-  // null,
-  // dispatch => ({dispatch})
-  // null
-)(AddTodo)
+AddTodo = connect()(AddTodo)
 
-let nextTodoId = 0
 const TodoApp = () => {
   return (<div>
     <AddTodo />
