@@ -69,13 +69,12 @@ const getVisibleTodos = (
   }
 }
 
-const FilterLink = ({
-  filter,
-  currentFilter,
+const Link = ({
+  active,
   onClick,
   children
 }) => {
-  if (filter === currentFilter) {
+  if (active) {
     return (
       <span>
         {children}
@@ -86,7 +85,7 @@ const FilterLink = ({
     <a href='#'
        onClick={ e => {
         e.preventDefault()
-        onClick(filter)
+        onClick()
        }}
     >
       {children}
@@ -94,30 +93,50 @@ const FilterLink = ({
   )
 }
 
-const Footer = ({
-  visibilityFilter,
-  onFilterClick
-}) => {
+class FilterLink extends React.Component {
+  componentWillMount() {
+    this.unsubscribe = store.subscribe(() => this.forceUpdate())
+  }
+
+  componentWillUnmount() {
+    this.unsubscribe()
+  }
+
+  render() {
+    const props = this.props
+    const state = store.getState()
+
+    return (
+      <Link
+        active={props.filter === state.visibilityFilter}
+        onClick={() =>
+          store.dispatch({
+            type: 'SET_VISIBILITY_FILTER',
+            filter: props.filter
+          })
+        }
+      >
+        {props.children}
+      </Link>
+    )
+  }
+}
+
+const Footer = () => {
   return (
     <p>
       Show:
       {' '}
       <FilterLink
         filter='SHOW_ALL'
-        currentFilter={visibilityFilter}
-        onClick={onFilterClick}
       >All</FilterLink>
       {', '}
       <FilterLink
         filter='SHOW_ACTIVE'
-        currentFilter={visibilityFilter}
-        onClick={onFilterClick}
       >Active</FilterLink>
       {', '}
       <FilterLink
         filter='SHOW_COMPLETED'
-        currentFilter={visibilityFilter}
-        onClick={onFilterClick}
       >Completed</FilterLink>
     </p>
   )
@@ -200,15 +219,7 @@ const TodoApp = ({todos, visibilityFilter}) => {
         })
       }
     />
-    <Footer
-      visibilityFilter={visibilityFilter}
-      onFilterClick={filter =>
-        store.dispatch({
-          type: 'SET_VISIBILITY_FILTER',
-          filter
-        })
-      }
-    />
+    <Footer />
   </div>)
 }
 
