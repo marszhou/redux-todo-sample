@@ -4,19 +4,19 @@ import FilterLink from '../containers/FilterLink'
 export default () => {
   return (
     <p>
-      Show:
+      过滤:
       {' '}
       <FilterLink
         filter='all'
-      >All</FilterLink>
+      >全部</FilterLink>
       {', '}
       <FilterLink
         filter='active'
-      >Active</FilterLink>
+      >未完成</FilterLink>
       {', '}
       <FilterLink
         filter='completed'
-      >Completed</FilterLink>
+      >已完成</FilterLink>
     </p>
   )
 }
