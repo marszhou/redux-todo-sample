@@ -6,6 +6,13 @@ const byId = (state = {}, action) => {
         return ret
       }, {})
       return {...state, ...newMapOfTodo}
+
+    case 'ADD_TODO_SUCCESS':
+      return {
+        ...state,
+        [action.response.id]: action.response
+      }
+
     default:
       return state
   }
