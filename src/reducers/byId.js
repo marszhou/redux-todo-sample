@@ -1,6 +1,6 @@
 const byId = (state = {}, action) => {
   switch (action.type) {
-    case 'RECEIVE_TODOS':
+    case 'FETCH_TODOS_SUCCESS':
       const newMapOfTodo = action.response.reduce((ret, todo) => {
         ret[todo.id] = todo
         return ret
